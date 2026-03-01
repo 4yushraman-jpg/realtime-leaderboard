@@ -48,18 +48,31 @@ func main() {
 		JWTSecret: []byte(jwtSecret),
 	}
 
+	gameHandler := handlers.GameHandler{
+		DB: dbPool,
+	}
+
+	scoreHandler := handlers.ScoreHandler{
+		DB:    dbPool,
+		Redis: redisClient,
+	}
+
 	r := chi.NewRouter()
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Post("/users/register", userHandler.RegisterUserHandler)
 		r.Post("/users/login", userHandler.LoginUserHandler)
+		r.Get("/games", gameHandler.GetGamesHandler)
+		r.Get("/games/{id}", gameHandler.GetGameByIDHandler)
 
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.AuthMiddleware([]byte(jwtSecret)))
+			r.Post("/scores", scoreHandler.SubmitScoreHandler)
+			r.Get("/games/{id}/leaderboard", scoreHandler.GetLeaderboardHandler)
 
 			r.Group(func(r chi.Router) {
 				r.Use(middleware.AdminOnlyMiddleware)
-
+				r.Post("/games", gameHandler.CreateGameHandler)
 			})
 		})
 	})
