@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/httprate"
 	"github.com/joho/godotenv"
 )
 
@@ -59,9 +60,15 @@ func main() {
 
 	r := chi.NewRouter()
 
+	r.Use(httprate.LimitByIP(100, time.Minute))
+
 	r.Route("/api/v1", func(r chi.Router) {
-		r.Post("/users/register", userHandler.RegisterUserHandler)
-		r.Post("/users/login", userHandler.LoginUserHandler)
+		r.Group(func(r chi.Router) {
+			r.Use(httprate.LimitByIP(5, time.Minute))
+			r.Post("/users/register", userHandler.RegisterUserHandler)
+			r.Post("/users/login", userHandler.LoginUserHandler)
+		})
+
 		r.Get("/games", gameHandler.GetGamesHandler)
 		r.Get("/games/{id}", gameHandler.GetGameByIDHandler)
 
@@ -69,6 +76,9 @@ func main() {
 			r.Use(middleware.AuthMiddleware([]byte(jwtSecret)))
 			r.Post("/scores", scoreHandler.SubmitScoreHandler)
 			r.Get("/games/{id}/leaderboard", scoreHandler.GetLeaderboardHandler)
+			r.Get("/games/{id}/rank", scoreHandler.GetUserRankHandler)
+			r.Get("/leaderboard/global", scoreHandler.GetGlobalLeaderboardHandler)
+			r.Get("/games/{id}/leaderboard/monthly", scoreHandler.GetMonthlyLeaderboardHandler)
 
 			r.Group(func(r chi.Router) {
 				r.Use(middleware.AdminOnlyMiddleware)

@@ -1,10 +1,10 @@
 module realtime-leaderboard
 
-go 1.25.6
+go 1.24.0
 
 require (
-	github.com/go-chi/chi v1.5.5
 	github.com/go-chi/chi/v5 v5.2.5
+	github.com/go-chi/httprate v0.14.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/joho/godotenv v1.5.1
