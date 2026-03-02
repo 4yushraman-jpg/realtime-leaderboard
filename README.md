@@ -36,7 +36,7 @@ A real-time leaderboard backend API built with Go, PostgreSQL, and Redis. Users 
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/4yushraman-jpg/realtime-leaderboard
    cd realtime-leaderboard
    ```
 
